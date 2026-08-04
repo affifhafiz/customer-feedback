@@ -245,8 +245,10 @@
       <textarea id="commentInput" placeholder="Anything else? (optional)"></textarea>
 
       <input type="text" id="nameInput" placeholder="Your name (optional)"
-        style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:12px;font-size:14px;margin-bottom:20px;">
-
+       style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:12px;font-size:14px;margin-bottom:12px;">
+      <input type="text" id="staffNameInput" placeholder="Staff name (optional)"
+       style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:12px;font-size:14px;margin-bottom:20px;">
+ 
       <button class="primary" id="submitBtn">Send feedback</button>
       <div class="err" id="formErr"></div>
       <button class="staff-link" id="staffLinkBtn">Staff login</button>
@@ -305,7 +307,7 @@
 
 <script>
 const STAFF_PIN = "1234"; // change this before deployment
-const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyzMm5SlasZo__o2MaRBg-c_MAlnf1sXtlt5vqVpiXPiVSvHlxB8KfwdIYB6FPh2mvA/exec";
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwxgCEJyffupeLWR10i_koLb62HPFJNTUHfiD63iUrDwsdCibJhvuYPbEW0nVIVizTE/exec";
 const RATING_STATES = {
   1: { label: "Empty — Not good", face: "😞" },
   2: { label: "Low — Needs work", face: "😕" },
@@ -338,6 +340,7 @@ async function loadEntries(){
     return rows.map(r => ({
       id: r.id,
       name: r.name || '',
+      staffName: r.staffName || r.staff_name || '',
       rating: Number(r.rating),
       tags: r.tags ? String(r.tags).split(',').map(t=>t.trim()).filter(Boolean) : [],
       comment: r.comment || '',
@@ -368,6 +371,7 @@ document.getElementById('submitBtn').addEventListener('click', async ()=>{
     const entry = {
       id: Date.now()+'-'+Math.random().toString(36).slice(2,7),
       name: document.getElementById('nameInput').value.trim(),
+      staffName: document.getElementById('staffNameInput').value.trim(),
       rating: Number(ratingInput.value),
       tags: Array.from(selectedTags),
       comment: document.getElementById('commentInput').value.trim(),
@@ -393,6 +397,7 @@ document.getElementById('againBtn').addEventListener('click', ()=>{
   document.querySelectorAll('.tag').forEach(el=>el.classList.remove('on'));
   document.getElementById('commentInput').value = '';
   document.getElementById('nameInput').value = '';
+  document.getElementById('staffNameInput').value = '';
   document.getElementById('thanksStage').classList.add('hidden');
   document.getElementById('formStage').classList.remove('hidden');
 });
@@ -451,7 +456,7 @@ async function renderDashboard(){
 
   const commentsList = document.getElementById('commentsList');
   commentsList.innerHTML = '';
-  const withComments = entries.filter(e=>e.comment || e.name).sort((a,b)=>b.ts-a.ts).slice(0,15);
+  const withComments = entries.filter(e=>e.comment || e.name || e.staffName).sort((a,b)=>b.ts-a.ts).slice(0,15);
   if(withComments.length===0){
     commentsList.innerHTML = '<div class="loading">No comments yet</div>';
   }
@@ -461,7 +466,12 @@ async function renderDashboard(){
     div.textContent = e.comment || '(no comment)';
     const meta = document.createElement('div');
     meta.className = 'meta';
-    meta.textContent = `${e.name ? e.name+' · ' : ''}Rating ${e.rating}/5 · ${new Date(e.ts).toLocaleString()}`;
+    const metaParts = [];
+    if(e.staffName){ metaParts.push(`Staff: ${e.staffName}`); }
+    if(e.name){ metaParts.push(e.name); }
+    metaParts.push(`Rating ${e.rating}/5`);
+    metaParts.push(new Date(e.ts).toLocaleString());
+    meta.textContent = metaParts.join(' · ');
     div.appendChild(meta);
     commentsList.appendChild(div);
   });
