@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Quick Feedback</title>
+<title>Customer Feedback</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" crossorigin="anonymous">
 <style>
@@ -220,8 +220,11 @@
   <!-- CUSTOMER VIEW -->
   <div id="customerView">
     <div id="formStage">
-      <p class="eyebrow">Quick Feedback</p>
-      <h1>How was your visit today?</h1>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+        <img src="shell logo.jpg" alt="Shell Malaysia logo" style="height:32px;width:auto;display:block;border-radius:6px;">
+        <p class="eyebrow" style="text-align:center;margin:0;">FIZANA EMPIRE RESOURCES</p>
+      </div>
+      <h1 style="text-align:center;">How was your visit today?</h1>
 
       <div class="gauge-wrap">
         <div class="gauge-track"></div>
@@ -259,7 +262,7 @@
 
   <!-- DASHBOARD VIEW -->
   <div id="dashboardView" class="hidden">
-    <p class="eyebrow">Staff Dashboard</p>
+    <p class="eyebrow">FIZANA EMPIRE RESOURCES</p>
     <h1>Customer Feedback</h1>
     <div id="lastUpdated" style="font-size:12px;color:var(--text-dim);margin:-14px 0 18px;"></div>
     <div id="dashLoading" class="loading">Loading feedback…</div>
