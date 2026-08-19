@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title>Customer Feedback</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" crossorigin="anonymous">
+  <style>
+    :root {
+      --bg: #231308;
+      --surface: #3b2716;
+      --surface-2: #4b341f;
+      --text: #fff3d6;
+      --text-dim: #ffdda3;
+      --empty: #d62828;
+      --mid: #f5c32c;
+      --full: #ff7f11;
+      --border: #7a3300;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px 28px 24px;
+      position: relative;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--mid);
+      font-weight: 600;
+      margin: 0 0 6px;
+    }
+
+    h1 {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 28px;
+      letter-spacing: .02em;
+      margin: 0 0 24px;
+      line-height: 1.15;
+    }
+
+    .gauge-wrap {
+      margin-bottom: 28px;
+      position: relative;
+    }
+
+    .star-rating {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .star {
+      all: unset;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      color: var(--text-dim);
+      background: var(--surface-2);
+      font-size: 28px;
+      cursor: pointer;
+      transition: .15s ease;
+      user-select: none;
+    }
+
+    .star:hover,
+    .star:focus {
+      color: var(--full);
+      background: rgba(255, 255, 255, .08);
+      outline: 2px solid rgba(255, 255, 255, .18);
+    }
+
+    .star.on {
+      color: var(--full);
+      background: rgba(255, 255, 255, .12);
+    }
+
+    .fireworks {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+    }
+
+    .firework {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(1);
+      animation: burst 700ms ease-out forwards;
+    }
+
+    @keyframes burst {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.3);
+      }
+    }
+
+    input[type=range] {
+      display: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid var(--surface-2);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
+      cursor: pointer;
+      margin-top: -6px;
+    }
+
+    input[type=range]::-moz-range-thumb {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid var(--surface-2);
+      cursor: pointer;
+    }
+
+    .gauge-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 14px;
+    }
+
+    .gauge-face {
+      text-align: center;
+      font-size: 40px;
+      margin-bottom: 10px;
+      line-height: 1;
+    }
+
+    .gauge-readout {
+      text-align: center;
+      font-family: 'Oswald', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+      min-height: 26px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tag {
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-dim);
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+      transition: .15s;
+    }
+
+    .tag.on {
+      background: var(--mid);
+      border-color: var(--mid);
+      color: #1a1200;
+      font-weight: 600;
+    }
+
+    textarea {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      min-height: 70px;
+      margin-bottom: 20px;
+    }
+
+    textarea:focus,
+    .tag:focus-visible,
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--full);
+      outline-offset: 2px;
+    }
+
+    button.primary {
+      width: 100%;
+      background: var(--full);
+      color: #08201a;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      cursor: pointer;
+    }
+
+    button.primary:disabled {
+      opacity: .5;
+      cursor: default;
+    }
+
+    .staff-link,
+    .manager-link {
+      display: block;
+      text-align: center;
+      margin: 18px auto 0;
+      max-width: 240px;
+      font-size: 13px;
+      color: var(--full);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s ease, transform .15s ease;
+    }
+    .staff-link:hover,
+    .staff-link:focus,
+    .manager-link:hover,
+    .manager-link:focus {
+      background: rgba(255,255,255,.16);
+      transform: translateY(-1px);
+    }
+
+    .thanks {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .thanks .big {
+      font-size: 44px;
+      margin-bottom: 10px;
+    }
+
+    .thanks p {
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+
+    .low-alert {
+      background: rgba(214, 40, 40, 0.12);
+      border: 1px solid rgba(214, 40, 40, 0.35);
+      color: #ffe6d6;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin: 10px auto 16px;
+      max-width: 320px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .low-alert strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* dashboard */
+    .stat-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat .n {
+      font-family: 'Oswald', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .stat .l {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .barrow {
+      margin-bottom: 10px;
+    }
+
+    .barrow .top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 4px;
+      color: var(--text-dim);
+    }
+
+    .barbg {
+      height: 8px;
+      background: var(--surface-2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .barfill {
+      height: 100%;
+      background: var(--mid);
+    }
+
+    .comment {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .comment.low-rating {
+      background: rgba(214, 40, 40, 0.18);
+      border-color: rgba(214, 40, 40, 0.75);
+      color: #ffe6e0;
+    }
+
+    .comment.low-rating .meta {
+      color: #ffd9d2;
+    }
+
+    .comment .meta {
+      color: var(--text-dim);
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-dim);
+      margin: 22px 0 10px;
+    }
+
+    .row-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button.secondary {
+      flex: 1;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .pin-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .pin-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      width: 260px;
+      text-align: center;
+    }
+
+    .pin-box input {
+      width: 100%;
+      text-align: center;
+      font-size: 22px;
+      letter-spacing: .3em;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 10px;
+      margin: 14px 0;
+      font-family: inherit;
+    }
+
+    .err {
+      color: var(--empty);
+      font-size: 12px;
+      margin-top: 6px;
+      min-height: 16px;
+    }
+
+    .loading {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 13px;
+      padding: 20px 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+
+    <!-- CUSTOMER VIEW -->
+    <div id="customerView">
+      <div id="formStage">
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+          <img src="shell-logo.jpg" alt="Shell Malaysia logo"
+            style="height:32px;width:auto;display:block;border-radius:6px;">
+          <p class="eyebrow" style="text-align:center;margin:0;">FIZANA EMPIRE ENTERPRISE</p>
+        </div>
+        <h1 style="text-align:center;">How was your visit today?</h1>
+
+        <div class="gauge-wrap">
+          <input type="hidden" id="ratingInput" value="3">
+          <div class="star-rating" role="radiogroup" aria-label="Rating">
+            <button type="button" class="star" role="radio" aria-checked="false" data-value="1"
+              aria-label="1 star">☆</button>
+            <button type="button" class="star" role="radio" aria-checked="false" data-value="2"
+              aria-label="2 stars">☆</button>
+            <button type="button" class="star" role="radio" aria-checked="false" data-value="3"
+              aria-label="3 stars">☆</button>
+            <button type="button" class="star" role="radio" aria-checked="false" data-value="4"
+              aria-label="4 stars">☆</button>
+            <button type="button" class="star" role="radio" aria-checked="false" data-value="5"
+              aria-label="5 stars">☆</button>
+          </div>
+          <div class="gauge-face" id="gaugeFace" aria-hidden="true">😐</div>
+          <div class="gauge-readout" id="gaugeReadout">2 — Okay</div>
+          <div class="fireworks hidden" id="fireworks"></div>
+        </div>
+
+        <div class="tags" id="tagRow">
+          <div class="tag" data-tag="Friendly staff">Friendly staff</div>
+          <div class="tag" data-tag="Fast service">Fast service</div>
+          <div class="tag" data-tag="Clean store">Clean store</div>
+          <div class="tag" data-tag="Fair prices">Fair prices</div>
+          <div class="tag" data-tag="Long queue">Long queue</div>
+        </div>
+
+        <textarea id="commentInput" placeholder="Anything else? (optional)"></textarea>
+
+        <input type="text" id="nameInput" placeholder="Customer name (optional)"
+          style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:12px;font-size:14px;margin-bottom:12px;">
+        <input type="text" id="staffNameInput" placeholder="Staff name (optional)"
+          style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:12px;font-size:14px;margin-bottom:20px;">
+
+        <button class="primary" id="submitBtn">Send feedback</button>
+        <div class="err" id="formErr"></div>
+        <button class="manager-link" id="managerLinkBtn">Manager login</button>
+      </div>
+
+      <div id="thanksStage" class="thanks hidden">
+        <div class="big">✅</div>
+        <h1 style="margin-bottom:6px;">Thanks!</h1>
+        <div id="lowRatingBanner" class="low-alert hidden">
+          <strong>Sorry for the poor experience.</strong>
+          <div>We&apos;re reviewing your feedback immediately and our team will follow up.</div>
+        </div>
+        <p>Your feedback helps us improve.</p>
+        <button class="primary" id="againBtn">Rate again</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboardView" class="hidden">
+      <p class="eyebrow">FIZANA EMPIRE ENTERPRISE</p>
+      <h1>Customer Feedback</h1>
+      <div id="lastUpdated" style="font-size:12px;color:var(--text-dim);margin:-14px 0 18px;"></div>
+      <div id="dashLoading" class="loading">Loading feedback…</div>
+      <div id="dashContent" class="hidden">
+        <div class="stat-row">
+          <div class="stat">
+            <div class="n" id="statAvg">–</div>
+            <div class="l">Avg rating</div>
+          </div>
+          <div class="stat">
+            <div class="n" id="statCount">–</div>
+            <div class="l">Responses</div>
+          </div>
+        </div>
+
+        <div class="section-title">What customers mention</div>
+        <div id="tagBars"></div>
+
+        <div class="section-title">Recent comments</div>
+        <div id="commentsList"></div>
+
+        <div class="row-btns">
+          <button class="secondary" id="testConnBtn">Test connectivity</button>
+          <button class="secondary" id="refreshBtn">Refresh</button>
+          <button class="secondary" id="resetBtn">Clear all data</button>
+        </div>
+      </div>
+      <button class="manager-link" id="backBtn">← Back to customer view</button>
+    </div>
+
+    <!-- PIN MODAL -->
+    <div class="pin-modal hidden" id="pinModal">
+      <div class="pin-box">
+        <p class="eyebrow" style="text-align:center;">Manager Access</p>
+        <div>Enter PIN</div>
+        <input type="password" id="pinInput" maxlength="4" inputmode="numeric" placeholder="••••">
+        <div class="err" id="pinErr"></div>
+        <div class="row-btns">
+          <button class="secondary" id="pinCancel">Cancel</button>
+          <button class="primary" id="pinOk">Enter</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const MANAGER_PIN = "2327";
+    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbybawAD_NVg7yy2l7qnoevC4tx-UX-Emm7pj_OmOVvBT_BuwMvO0LfRilofwtRyEc20/exec";
+    // Use a different sheet (tab) name for this copy. Update to match your spreadsheet's tab name.
+    const SHEET_NAME_OVERRIDE = "Feedback KG";
+    const RATING_STATES = {
+      1: { label: "1 — Not good", face: "😞" },
+      2: { label: "2 — Needs work", face: "😕" },
+      3: { label: "3 — Okay", face: "😐" },
+      4: { label: "4 — Good", face: "🙂" },
+      5: { label: "5 — Excellent!", face: "😄" }
+    };
+    const selectedTags = new Set();
+
+    const ratingInput = document.getElementById('ratingInput');
+    const stars = Array.from(document.querySelectorAll('.star'));
+    const gaugeReadout = document.getElementById('gaugeReadout');
+
+    function setRating(value) {
+      ratingInput.value = value;
+      const state = RATING_STATES[value] || RATING_STATES[3];
+      gaugeReadout.textContent = state.label;
+      document.getElementById('gaugeFace').textContent = state.face;
+      stars.forEach(star => {
+        const active = Number(star.dataset.value) <= value;
+        star.classList.toggle('on', active);
+        star.textContent = active ? '★' : '☆';
+        star.setAttribute('aria-checked', String(Number(star.dataset.value) === value));
+      });
+      if (value === 5) {
+        triggerFireworks();
+      }
+    }
+
+    function triggerFireworks() {
+      const container = document.getElementById('fireworks');
+      container.classList.remove('hidden');
+      const colors = ['#FFDD57', '#FFD166', '#FF7F11', '#F94144', '#F9C74F'];
+      const particles = [];
+      for (let i = 0; i < 12; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'firework';
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 60 + Math.random() * 40;
+        dot.style.setProperty('--dx', Math.cos(angle) * distance + 'px');
+        dot.style.setProperty('--dy', Math.sin(angle) * distance + 'px');
+        dot.style.background = colors[i % colors.length];
+        container.appendChild(dot);
+        particles.push(dot);
+      }
+      setTimeout(() => {
+        particles.forEach(dot => dot.remove());
+        container.classList.add('hidden');
+      }, 750);
+    }
+
+    stars.forEach(star => {
+      star.addEventListener('click', () => setRating(Number(star.dataset.value)));
+    });
+
+    setRating(Number(ratingInput.value));
+
+    document.querySelectorAll('.tag').forEach(el => {
+      el.addEventListener('click', () => {
+        const t = el.dataset.tag;
+        if (selectedTags.has(t)) { selectedTags.delete(t); el.classList.remove('on'); }
+        else { selectedTags.add(t); el.classList.add('on'); }
+      });
+    });
+
+    async function loadEntries() {
+      try {
+        const res = await fetch(SHEET_API_URL + '?sheet=' + encodeURIComponent(SHEET_NAME_OVERRIDE));
+        const rows = await res.json();
+        return rows.map(r => ({
+          id: r.id,
+          customerName: r.customerName || r.customer_name || r.name || '',
+          staffName: r.staffName || r.staff_name || '',
+          rating: Number(r.rating),
+          tags: r.tags ? String(r.tags).split(',').map(t => t.trim()).filter(Boolean) : [],
+          comment: r.comment || '',
+          ts: new Date(r.ts).getTime()
+        }));
+      } catch (e) {
+        return [];
+      }
+    }
+    async function submitEntry(entry) {
+      // Apps Script's POST response doesn't carry proper CORS headers (a known limitation),
+      // so we send this as a one-way "fire and forget" request rather than trying to read a response.
+      await fetch(SHEET_API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(Object.assign({}, entry, { sheet: SHEET_NAME_OVERRIDE }))
+      });
+      return true; // no-cors gives us no visibility into success/failure — we confirm via the dashboard instead
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('submitBtn');
+      const errEl = document.getElementById('formErr');
+      errEl.textContent = '';
+      btn.disabled = true; btn.textContent = 'Sending…';
+      try {
+        const entry = {
+          id: Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+          customerName: (document.getElementById('nameInput') && document.getElementById('nameInput').value.trim()) || '',
+          staffName: (document.getElementById('staffNameInput') && document.getElementById('staffNameInput').value.trim()) || '',
+          rating: Number(ratingInput.value),
+          tags: Array.from(selectedTags),
+          comment: (document.getElementById('commentInput') && document.getElementById('commentInput').value.trim()) || '',
+          ts: Date.now()
+        };
+        const ok = await submitEntry(entry);
+        if (!ok) throw new Error('save failed');
+        document.getElementById('formStage').classList.add('hidden');
+        document.getElementById('thanksStage').classList.remove('hidden');
+        const sorryTextEl = document.getElementById('sorryText');
+        const lowBanner = document.getElementById('lowRatingBanner');
+        if (entry.rating <= 3) {
+          if (sorryTextEl) { sorryTextEl.classList.remove('hidden'); sorryTextEl.style.display = '' }
+          if (lowBanner) lowBanner.classList.remove('hidden');
+          // small timeout so alert doesn't block UI updates
+          setTimeout(() => {
+            try { alert('We\'re sorry your experience was not great. We will review your feedback right away.'); } catch (e) { /* ignore */ }
+          }, 50);
+        } else {
+          if (sorryTextEl) { sorryTextEl.classList.add('hidden'); sorryTextEl.style.display = 'none' }
+          if (lowBanner) lowBanner.classList.add('hidden');
+        }
+      } catch (e) {
+        errEl.textContent = "Error: " + e.name + " — " + e.message;
+      } finally {
+        btn.disabled = false; btn.textContent = 'Send feedback';
+      }
+    });
+
+    const againBtn = document.getElementById('againBtn');
+    if (againBtn) {
+      againBtn.addEventListener('click', () => {
+        setRating(3);
+        selectedTags.clear();
+        document.querySelectorAll('.tag').forEach(el => el.classList.remove('on'));
+        const commentInput = document.getElementById('commentInput');
+        const nameInput = document.getElementById('nameInput');
+        const staffNameInput = document.getElementById('staffNameInput');
+        if (commentInput) commentInput.value = '';
+        if (nameInput) nameInput.value = '';
+        if (staffNameInput) staffNameInput.value = '';
+        const sorryTextEl = document.getElementById('sorryText');
+        const lowBanner = document.getElementById('lowRatingBanner');
+        if (sorryTextEl) { sorryTextEl.classList.add('hidden'); sorryTextEl.style.display = 'none' }
+        if (lowBanner) lowBanner.classList.add('hidden');
+        const thanksStage = document.getElementById('thanksStage');
+        const formStage = document.getElementById('formStage');
+        if (thanksStage) thanksStage.classList.add('hidden');
+        if (formStage) formStage.classList.remove('hidden');
+      });
+    }
+
+    // manager / pin flow
+    const pinModal = document.getElementById('pinModal');
+    document.getElementById('managerLinkBtn').addEventListener('click', () => {
+      document.getElementById('pinInput').value = '';
+      document.getElementById('pinErr').textContent = '';
+      pinModal.classList.remove('hidden');
+    });
+    document.getElementById('pinCancel').addEventListener('click', () => pinModal.classList.add('hidden'));
+    document.getElementById('pinOk').addEventListener('click', async () => {
+      if (document.getElementById('pinInput').value === MANAGER_PIN) {
+        pinModal.classList.add('hidden');
+        document.getElementById('customerView').classList.add('hidden');
+        document.getElementById('dashboardView').classList.remove('hidden');
+        await renderDashboard();
+      } else {
+        document.getElementById('pinErr').textContent = 'Wrong PIN';
+      }
+    });
+
+    document.getElementById('backBtn').addEventListener('click', () => {
+      document.getElementById('dashboardView').classList.add('hidden');
+      document.getElementById('customerView').classList.remove('hidden');
+    });
+
+    async function renderDashboard() {
+      document.getElementById('dashLoading').classList.remove('hidden');
+      document.getElementById('dashContent').classList.add('hidden');
+      const entries = await loadEntries();
+      document.getElementById('dashLoading').classList.add('hidden');
+      document.getElementById('dashContent').classList.remove('hidden');
+
+      document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+      document.getElementById('statCount').textContent = entries.length;
+      const avg = entries.length ? (entries.reduce((s, e) => s + e.rating, 0) / entries.length) : 0;
+      document.getElementById('statAvg').textContent = entries.length ? avg.toFixed(1) + ' / 5' : '–';
+
+      const tagCounts = {};
+      entries.forEach(e => (e.tags || []).forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1));
+      const tagBars = document.getElementById('tagBars');
+      tagBars.innerHTML = '';
+      const maxCount = Math.max(1, ...Object.values(tagCounts));
+      Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).forEach(([tag, count]) => {
+        const row = document.createElement('div');
+        row.className = 'barrow';
+        row.innerHTML = `<div class="top"><span>${tag}</span><span>${count}</span></div>
+      <div class="barbg"><div class="barfill" style="width:${(count / maxCount * 100)}%"></div></div>`;
+        tagBars.appendChild(row);
+      });
+      if (Object.keys(tagCounts).length === 0) {
+        tagBars.innerHTML = '<div class="loading">No tags yet</div>';
+      }
+
+      const commentsList = document.getElementById('commentsList');
+      commentsList.innerHTML = '';
+      const withComments = entries.filter(e => e.comment || e.customerName || e.staffName).sort((a, b) => b.ts - a.ts).slice(0, 15);
+      if (withComments.length === 0) {
+        commentsList.innerHTML = '<div class="loading">No comments yet</div>';
+      }
+      withComments.forEach(e => {
+        const div = document.createElement('div');
+        div.className = 'comment' + (e.rating <= 3 ? ' low-rating' : '');
+        div.textContent = e.comment || '(no comment)';
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const metaParts = [];
+        if (e.staffName) { metaParts.push(`Staff: ${e.staffName}`); }
+        if (e.customerName) { metaParts.push(e.customerName); }
+        metaParts.push(`Rating ${e.rating}/5`);
+        metaParts.push(new Date(e.ts).toLocaleString());
+        meta.textContent = metaParts.join(' · ');
+        div.appendChild(meta);
+        commentsList.appendChild(div);
+      });
+    }
+
+    document.getElementById('testConnBtn').addEventListener('click', async () => {
+      try {
+        const r = await fetch('https://jsonplaceholder.typicode.com/posts/1');
+        const j = await r.json();
+        alert('OUTBOUND FETCH WORKS.\nGot: ' + JSON.stringify(j).slice(0, 100));
+      } catch (e) {
+        alert('OUTBOUND FETCH BLOCKED.\n' + e.name + ': ' + e.message);
+      }
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', renderDashboard);
+
+
+    document.getElementById('resetBtn').addEventListener('click', async () => {
+      if (!confirm('Delete all stored feedback? This cannot be undone.')) return;
+      try {
+        await fetch(SHEET_API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'clear', sheet: SHEET_NAME_OVERRIDE })
+        });
+        await new Promise(r => setTimeout(r, 800)); // give Apps Script a moment to finish before we re-read
+        await renderDashboard();
+      } catch (e) {
+        alert('Could not clear data.');
+      }
+    });
+  </script>
+</body>
+
+</html>
