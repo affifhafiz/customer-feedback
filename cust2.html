@@ -561,7 +561,6 @@
         <div class="row-btns">
           <button class="secondary" id="testConnBtn">Test connectivity</button>
           <button class="secondary" id="refreshBtn">Refresh</button>
-          <button class="secondary" id="resetBtn">Clear all data</button>
         </div>
       </div>
       <button class="manager-link" id="backBtn">← Back to customer view</button>
@@ -835,22 +834,6 @@
     document.getElementById('refreshBtn').addEventListener('click', renderDashboard);
 
 
-    document.getElementById('resetBtn').addEventListener('click', async () => {
-      if (!confirm('Delete all stored feedback? This cannot be undone.')) return;
-      try {
-        const clearUrl = SHEET_API_URL + '?sheet=' + encodeURIComponent(SHEET_NAME_OVERRIDE);
-        await fetch(clearUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'clear', sheet: SHEET_NAME_OVERRIDE })
-        });
-        await new Promise(r => setTimeout(r, 800)); // give Apps Script a moment to finish before we re-read
-        await renderDashboard();
-      } catch (e) {
-        alert('Could not clear data.');
-      }
-    });
   </script>
 </body>
 
