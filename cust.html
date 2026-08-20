@@ -561,7 +561,6 @@
         <div class="row-btns">
           <button class="secondary" id="testConnBtn">Test connectivity</button>
           <button class="secondary" id="refreshBtn">Refresh</button>
-          <button class="secondary" id="resetBtn">Clear all data</button>
         </div>
       </div>
       <button class="manager-link" id="backBtn">← Back to customer view</button>
@@ -671,11 +670,13 @@
     async function submitEntry(entry) {
       // Apps Script's POST response doesn't carry proper CORS headers (a known limitation),
       // so we send this as a one-way "fire and forget" request rather than trying to read a response.
-      await fetch(SHEET_API_URL, {
+      const targetSheet = entry.sheet || 'Feedback';
+      const url = SHEET_API_URL + '?sheet=' + encodeURIComponent(targetSheet);
+      await fetch(url, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(entry)
+        body: JSON.stringify(Object.assign({}, entry, { sheet: targetSheet }))
       });
       return true; // no-cors gives us no visibility into success/failure — we confirm via the dashboard instead
     }
@@ -693,7 +694,8 @@
           rating: Number(ratingInput.value),
           tags: Array.from(selectedTags),
           comment: (document.getElementById('commentInput') && document.getElementById('commentInput').value.trim()) || '',
-          ts: Date.now()
+          ts: Date.now(),
+          sheet: 'Feedback'
         };
         const ok = await submitEntry(entry);
         if (!ok) throw new Error('save failed');
@@ -830,21 +832,6 @@
     document.getElementById('refreshBtn').addEventListener('click', renderDashboard);
 
 
-    document.getElementById('resetBtn').addEventListener('click', async () => {
-      if (!confirm('Delete all stored feedback? This cannot be undone.')) return;
-      try {
-        await fetch(SHEET_API_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'clear' })
-        });
-        await new Promise(r => setTimeout(r, 800)); // give Apps Script a moment to finish before we re-read
-        await renderDashboard();
-      } catch (e) {
-        alert('Could not clear data.');
-      }
-    });
   </script>
 </body>
 
