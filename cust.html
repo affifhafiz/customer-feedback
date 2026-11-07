@@ -86,23 +86,33 @@
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      color: var(--text-dim);
       background: var(--surface-2);
-      font-size: 28px;
       cursor: pointer;
       transition: .15s ease;
       user-select: none;
     }
 
+    .star img {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+      opacity: .5;
+      transition: opacity .15s ease;
+    }
+
     .star:hover,
     .star:focus {
-      color: var(--full);
       background: rgba(255, 255, 255, .08);
       outline: 2px solid rgba(255, 255, 255, .18);
     }
 
+    .star:hover img,
+    .star:focus img,
+    .star.on img {
+      opacity: 1;
+    }
+
     .star.on {
-      color: var(--full);
       background: rgba(255, 255, 255, .12);
     }
 
@@ -264,19 +274,20 @@
       max-width: 240px;
       font-size: 13px;
       color: var(--full);
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(255, 255, 255, .16);
       border-radius: 12px;
       padding: 10px 14px;
       cursor: pointer;
       text-decoration: none;
       transition: background .2s ease, transform .15s ease;
     }
+
     .staff-link:hover,
     .staff-link:focus,
     .manager-link:hover,
     .manager-link:focus {
-      background: rgba(255,255,255,.16);
+      background: rgba(255, 255, 255, .16);
       transform: translateY(-1px);
     }
 
@@ -487,15 +498,15 @@
           <input type="hidden" id="ratingInput" value="3">
           <div class="star-rating" role="radiogroup" aria-label="Rating">
             <button type="button" class="star" role="radio" aria-checked="false" data-value="1"
-              aria-label="1 star">☆</button>
+              aria-label="1 out of 5"><img src="shell-logo.png" alt=""></button>
             <button type="button" class="star" role="radio" aria-checked="false" data-value="2"
-              aria-label="2 stars">☆</button>
+              aria-label="2 out of 5"><img src="shell-logo.png" alt=""></button>
             <button type="button" class="star" role="radio" aria-checked="false" data-value="3"
-              aria-label="3 stars">☆</button>
+              aria-label="3 out of 5"><img src="shell-logo.png" alt=""></button>
             <button type="button" class="star" role="radio" aria-checked="false" data-value="4"
-              aria-label="4 stars">☆</button>
+              aria-label="4 out of 5"><img src="shell-logo.png" alt=""></button>
             <button type="button" class="star" role="radio" aria-checked="false" data-value="5"
-              aria-label="5 stars">☆</button>
+              aria-label="5 out of 5"><img src="shell-logo.png" alt=""></button>
           </div>
           <div class="gauge-face" id="gaugeFace" aria-hidden="true">😐</div>
           <div class="gauge-readout" id="gaugeReadout">2 — Okay</div>
@@ -606,7 +617,6 @@
       stars.forEach(star => {
         const active = Number(star.dataset.value) <= value;
         star.classList.toggle('on', active);
-        star.textContent = active ? '★' : '☆';
         star.setAttribute('aria-checked', String(Number(star.dataset.value) === value));
       });
       if (value === 5) {
